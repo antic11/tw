@@ -186,5 +186,126 @@
       }
     }
   </script>
+
+  <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>앤틱 홈페이지 & 종합 관리 시스템</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background-color: #f4f5f7; padding: 20px; }
+    
+    header {
+      background: #1e293b; color: white; text-align: center; 
+      padding: 15px; font-size: 1.4rem; font-weight: bold; border-radius: 8px; margin-bottom: 20px;
+    }
+
+    /* 2열 레이아웃 구성 */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 340px; /* 좌측 메인 : 우측 사이드바 */
+      gap: 20px;
+    }
+
+    /* 공통 카드 스타일 */
+    .card {
+      background: white; border-radius: 8px; padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+    }
+
+    /* 메인 영역 (앤틱 자료 전용) */
+    .main-content h2 { margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; }
+    .antique-item { margin-bottom: 15px; }
+    .antique-item h3 { font-size: 1rem; color: #1e293b; margin-bottom: 4px; }
+    .antique-item p { color: #64748b; font-size: 0.9rem; line-height: 1.4; }
+
+    /* 우측 사이드바 영역 */
+    .sidebar h3 { font-size: 1rem; margin-bottom: 10px; color: #334155; }
+    
+    /* Drop Zone (사진 업로드) */
+    .drop-zone {
+      border: 2px dashed #cbd5e1; border-radius: 6px; padding: 20px;
+      text-align: center; color: #64748b; cursor: pointer; font-size: 0.85rem;
+    }
+    .drop-zone:hover { background-color: #f8fafc; border-color: #3b82f6; }
+  </style>
+</head>
+<body>
+
+  <header>앤틱 홈페이지 & 종합 관리 시스템</header>
+
+  <div class="container">
+    <!-- 1. 주 화면: 앤틱 시대별 자료 -->
+    <main class="main-content">
+      <div class="card">
+        <h2>📜 앤틱 시대별 자료</h2>
+        
+        <div class="antique-item">
+          <h3>조지안 양식 (1714 - 1837)</h3>
+          <p>대칭성과 고전적 비율을 강조하며, 마호가니 목재가 주를 이룹니다.</p>
+        </div>
+
+        <div class="antique-item">
+          <h3>빅토리아 양식 (1837 - 1901)</h3>
+          <p>화려한 조각과 중후한 장식이 특징이며, 다양한 수공예 기법이 발달했습니다.</p>
+        </div>
+
+        <div class="antique-item">
+          <h3>아르누보 양식 (1890 - 1910)</h3>
+          <p>자연에서 영감을 받은 곡선과 유기적인 디자인이 주를 이룹니다.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 2. 우측 사이드바: 사진 첨부, 계산기, 음악, 안내창 -->
+    <aside class="sidebar">
+      <!-- 사진 첨부 & 업로드 -->
+      <div class="card">
+        <h3>📷 사진 첨부 및 업로드</h3>
+        <div class="drop-zone" onclick="document.getElementById('fileInput').click();">
+          📷 이곳을 클릭하거나 이미지를 드래그하여 첨부하세요.
+          <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+        </div>
+        <div id="fileList" style="margin-top: 10px; font-size: 0.85rem; color: #64748b;">
+          등록된 사진이 없습니다.
+        </div>
+      </div>
+
+      <!-- 앤틱 계산기 -->
+      <div class="card">
+        <h3>🧮 앤틱 계산기</h3>
+        <!-- 계산기 UI 구현 영역 -->
+        <p style="font-size: 0.85rem; color: #64748b;">계산기 기능이 이곳에 위치합니다.</p>
+      </div>
+
+      <!-- 배경 음악 -->
+      <div class="card">
+        <h3>🎵 배경 음악</h3>
+        <!-- 음악 플레이어 영역 -->
+        <audio controls style="width: 100%;">
+          <source src="your-audio-file.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+
+      <!-- 설명 및 안내창 -->
+      <div class="card">
+        <h3>ℹ️ 설명 및 안내창</h3>
+        <p style="font-size: 0.85rem; color: #64748b;">우측 사이드바에 독립 배치되어 메인 자료를 가리지 않습니다.</p>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // 사진 파일 선택 및 드래그 앤 드롭 핸들러 예시
+    function handleFiles(files) {
+      const fileList = document.getElementById('fileList');
+      if (files.length > 0) {
+        fileList.innerHTML = `총 ${files.length}개의 사진이 선택되었습니다.`;
+      }
+    }
+  </script>
+</body>
+</html>
 </body>
 </html>
