@@ -1,0 +1,644 @@
+
+Gemini와의 대화
+앤틱과 빈티지 사진을 보기쉽게 관리할 수 있는 홈페이지를 HTML 하나로 만들어줘. 나라별 시대별, 품목별 메뉴와 계산기 메뉴와 음악메뉴를 악기별 클래식과 성악가별 성악으로 구분하여 넣어줘. 연한 연두색 톤으로 깔끔하게 해줘
+
+앤틱과 빈티지 사진을 깔끔하고 직관적으로 관리할 수 있도록 요구하신 모든 기능(나라별/시대별/품목별 분류, 계산기, 악기별 클래식 및 성악가별 성악 음악 메뉴)을 포함하여 하나의 HTML 파일로 작성했습니다.
+
+연한 연두색(Sage Green/Mint 톤)을 메인 테마로 사용하여 눈이 편안하고 클래식한 분위기를 주도록 디자인했습니다.
+
+아래의 코드를 복사하여 확장자가 .html인 파일(예: antique_gallery.html)로 저장한 뒤 브라우저에서 열어보세요.
+
+HTML
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>앤틱 & 빈티지 갤러리 아카이브</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f4;
+            --card-bg: #ffffff;
+            --primary-color: #728c69; /* 연한 연두/세이지 그린 */
+            --primary-hover: #5d7554;
+            --accent-color: #e2ebd8;
+            --text-color: #333333;
+            --text-light: #666666;
+            --border-color: #d0ded0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 스타일 */
+        sidebar {
+            width: 280px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-area {
+            padding: 25px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+
+        .logo-area h1 {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .menu-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-section h3 {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-list li {
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .menu-list li:hover, .menu-list li.active {
+            background-color: var(--accent-color);
+            color: var(--primary-hover);
+            font-weight: bold;
+        }
+
+        /* 서브메뉴(음악, 계산기 내부) 들여쓰기 */
+        .sub-menu {
+            padding-left: 15px;
+            margin-top: 5px;
+            display: none;
+        }
+        .sub-menu.open {
+            display: block;
+        }
+
+        /* 메인 콘텐츠 영역 */
+        main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        header h2 {
+            color: var(--primary-hover);
+            font-size: 1.5rem;
+        }
+
+        .search-add-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"], select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* 콘텐츠 패널 관리 */
+        .content-panel {
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        /* 사진 카드 그리드 */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e9ede9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+
+        .card-info {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        /* 계산기 패널 디자인 */
+        .calculator-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            max-width: 500px;
+        }
+
+        .calc-group {
+            margin-bottom: 15px;
+        }
+
+        .calc-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .calc-group input, .calc-group select {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .calc-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-hover);
+            text-align: center;
+        }
+
+        /* 음악 플레이어 패널 디자인 */
+        .music-container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .music-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .music-list-item:hover {
+            background-color: var(--accent-color);
+        }
+
+        .music-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .music-info p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 사이드바 메뉴 -->
+    <sidebar>
+        <div class="logo-area">
+            <h1>🌿 Antique & Vintage</h1>
+        </div>
+
+        <!-- 1. 나라별 메뉴 -->
+        <div class="menu-section">
+            <h3>나라별 분류</h3>
+            <ul class="menu-list">
+                <li onclick="filterGallery('country', 'all', this)" class="active">전체 나라 보기</li>
+                <li onclick="filterGallery('country', '영국', this)">🇬🇧 영국 (UK)</li>
+                <li onclick="filterGallery('country', '프랑스', this)">🇫🇷 프랑스 (France)</li>
+                <li onclick="filterGallery('country', '미국', this)">🇺🇸 미국 (USA)</li>
+                <li onclick="filterGallery('country', '독일', this)">🇩🇪 독일 (Germany)</li>
+            </ul>
+        </div>
+
+        <!-- 2. 시대별 메뉴 -->
+        <div class="menu-section">
+            <h3>시대별 분류</h3>
+            <ul class="menu-list">
+                <li onclick="filterGallery('era', 'all', this)">전체 시대 보기</li>
+                <li onclick="filterGallery('era', '빅토리아', this)">빅토리아 시대 (1837~1901)</li>
+                <li onclick="filterGallery('era', '에드워디안', this)">에드워디안 (1901~1910)</li>
+                <li onclick="filterGallery('era', '아데코', this)">아르데코 / 미드센추리 (~1970)</li>
+            </ul>
+        </div>
+
+        <!-- 3. 품목별 메뉴 -->
+        <div class="menu-section">
+            <h3>품목별 분류</h3>
+            <ul class="menu-list">
+                <li onclick="filterGallery('category', 'all', this)">전체 품목 보기</li>
+                <li onclick="filterGallery('category', '도자기', this)">찻잔 및 도자기</li>
+                <li onclick="filterGallery('category', '가구', this)">소품 및 가구</li>
+                <li onclick="filterGallery('category', '은제품', this)">은제품 & 커트러리</li>
+                <li onclick="filterGallery('category', '시계', this)">시계 및 램프</li>
+            </ul>
+        </div>
+
+        <!-- 4. 계산기 메뉴 -->
+        <div class="menu-section">
+            <h3>유틸리티</h3>
+            <ul class="menu-list">
+                <li onclick="switchTab('calculator', this)">🧮 앤틱 관세·가치 계산기</li>
+            </ul>
+        </div>
+
+        <!-- 5. 음악 메뉴 -->
+        <div class="menu-section">
+            <h3>클래식 음악 감상</h3>
+            <ul class="menu-list">
+                <li onclick="toggleSubMenu('instrument-sub')">🎻 악기별 클래식 ▾</li>
+                <div id="instrument-sub" class="sub-menu">
+                    <li onclick="switchTab('music-instrument', this)">· 바이올린 소품곡</li>
+                    <li onclick="switchTab('music-instrument', this)">· 첼로 모음곡</li>
+                    <li onclick="switchTab('music-instrument', this)">· 피아노 녹턴</li>
+                </div>
+                
+                <li onclick="toggleSubMenu('vocal-sub')" style="margin-top: 5px;">🎤 성악가별 성악 ▾</li>
+                <div id="vocal-sub" class="sub-menu">
+                    <li onclick="switchTab('music-vocal', this)">· 루치아노 파바로티 (테너)</li>
+                    <li onclick="switchTab('music-vocal', this)">· 마리아 칼라스 (소프라노)</li>
+                    <li onclick="switchTab('music-vocal', this)">· 디트리히 피셔디스카우 (바리톤)</li>
+                </div>
+            </ul>
+        </div>
+    </sidebar>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main>
+        <!-- 헤더 검색 및 추가 -->
+        <header>
+            <h2 id="current-title">전체 앤틱·빈티지 갤러리</h2>
+            <div class="search-add-box">
+                <input type="text" id="searchInput" placeholder="소장품 이름 검색..." onkeyup="searchGallery()">
+                <button onclick="alert('새 사진 및 소장품 등록 모달창 (기능 확장용)')">+ 소장품 등록</button>
+            </div>
+        </header>
+
+        <!-- [갤러리 패널] -->
+        <div id="gallery-panel" class="content-panel active">
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- 샘플 아이템 1 -->
+                <div class="card" data-country="영국" data-era="빅토리아" data-category="도자기" data-name="영국 빅토리아 찻잔 세트">
+                    <div class="card-img">
+                        <!-- 임시 이미지 표현 -->
+                        <span style="color:#728c69; font-weight:bold;">[영국/도자기/빅토리아]</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">로열 알버트 찻잔 세트</div>
+                        <div class="card-info">나라: 영국 | 시대: 빅토리아</div>
+                        <div class="card-info">품목: 도자기 | 상태: 최상</div>
+                    </div>
+                </div>
+
+                <!-- 샘플 아이템 2 -->
+                <div class="card" data-country="프랑스" data-era="아데코" data-category="가구" data-name="프랑스 빈티지 콘솔">
+                    <div class="card-img">
+                        <span style="color:#728c69; font-weight:bold;">[프랑스/가구/아르데코]</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">프로방스풍 원목 콘솔</div>
+                        <div class="card-info">나라: 프랑스 | 시대: 아데코</div>
+                        <div class="card-info">품목: 가구 | 상태: 빈티지오리지널</div>
+                    </div>
+                </div>
+
+                <!-- 샘플 아이템 3 -->
+                <div class="card" data-country="독일" data-era="에드워디안" data-category="은제품" data-name="독일 실버 트레이">
+                    <div class="card-img">
+                        <span style="color:#728c69; font-weight:bold;">[독일/은제품/에드워디안]</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">독일 핸드메이드 실버 트레이</div>
+                        <div class="card-info">나라: 독일 | 시대: 에드워디안</div>
+                        <div class="card-info">품목: 은제품 | 상태: 광택복원완료</div>
+                    </div>
+                </div>
+
+                <!-- 샘플 아이템 4 -->
+                <div class="card" data-country="미국" data-era="아데코" data-category="시계" data-name="미국 빈티지 태엽시계">
+                    <div class="card-img">
+                        <span style="color:#728c69; font-weight:bold;">[미국/시계/아르데코]</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">세스토마스 태엽 벽시계</div>
+                        <div class="card-info">나라: 미국 | 시대: 아데코</div>
+                        <div class="card-info">품목: 시계 | 상태: 작동가능</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- [계산기 패널] -->
+        <div id="calculator-panel" class="content-panel">
+            <div class="calculator-container">
+                <h3 style="margin-bottom: 20px; color: var(--primary-hover);">🧮 앤틱 수입 관세 및 총 비용 계산기</h3>
+                <div class="calc-group">
+                    <label>물품 현지 구매가 (USD 기준)</label>
+                    <input type="number" id="itemPrice" placeholder="예: 300" oninput="calculateCost()">
+                </div>
+                <div class="calc-group">
+                    <label>배송비 (국제 배송 + 보험료)</label>
+                    <input type="number" id="shippingFee" placeholder="예: 50" oninput="calculateCost()">
+                </div>
+                <div class="calc-group">
+                    <label>환율 (USD to KRW)</label>
+                    <input type="number" id="exchangeRate" value="1350" oninput="calculateCost()">
+                </div>
+                <div class="calc-result" id="calcResult">
+                    예상 총 비용: 0 원 (관·부가세 면세 범위 확인 필요)
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 15px;">
+                    * 100년 이상 된 진품 앤틱의 경우 예술품·골동품으로 분류되어 관세가 면제되고 부가세(10%)만 적용될 수 있습니다. (세관 기준에 따라 상이함)
+                </p>
+            </div>
+        </div>
+
+        <!-- [음악 패널: 악기별 클래식] -->
+        <div id="music-instrument-panel" class="content-panel">
+            <div class="music-container">
+                <h3 style="margin-bottom: 20px; color: var(--primary-hover);">🎻 악기별 클래식 감상 큐레이션</h3>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>바흐 무반주 첼로 모음곡 1번 G장조</h4>
+                        <p>연주자: 요요마 | 악기: 첼로</p>
+                    </div>
+                    <button onclick="alert('배경 음악 재생 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>차이콥스키 바이올린 협주곡 D장조 Op.35</h4>
+                        <p>연주자: 다비드 오이스트라흐 | 악기: 바이올린</p>
+                    </div>
+                    <button onclick="alert('배경 음악 재생 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>쇼팽 야상곡(녹턴) 2번 E장조 Op.9</h4>
+                        <p>연주자: 아르투르 루빈스타인 | 악기: 피아노</p>
+                    </div>
+                    <button onclick="alert('배경 음악 재생 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- [음악 패널: 성악가별 성악] -->
+        <div id="music-vocal-panel" class="content-panel">
+            <div class="music-container">
+                <h3 style="margin-bottom: 20px; color: var(--primary-hover);">🎤 성악가별 명곡 감상 큐레이션</h3>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>푸치니 오페라 투란도트 중 '공주는 잠 못 이루고 (Nessun Dorma)'</h4>
+                        <p>성악가: 루치아노 파바로티 (테너)</p>
+                    </div>
+                    <button onclick="alert('성악 감상 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>벨리니 오페라 노르마 중 '정결한 여신이여 (Casta Diva)'</h4>
+                        <p>성악가: 마리아 칼라스 (소프라노)</p>
+                    </div>
+                    <button onclick="alert('성악 감상 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+                <div class="music-list-item">
+                    <div class="music-info">
+                        <h4>슈베르트 연가곡 겨울나그네 중 '보리수'</h4>
+                        <p>성악가: 디트리히 피셔디스카우 (바리톤)</p>
+                    </div>
+                    <button onclick="alert('성악 감상 시뮬레이션: 재생을 시작합니다.')">▶ 재생</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 자바스크립트 기능 구현 -->
+    <script>
+        // 하위 메뉴 토글 함수
+        function toggleSubMenu(id) {
+            const subMenu = document.getElementById(id);
+            subMenu.classList.toggle('open');
+        }
+
+        // 탭 및 패널 전환 함수
+        function switchTab(type, element) {
+            // 모든 패널 숨기기
+            document.querySelectorAll('.content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // 메뉴 활성화 상태 변경
+            if(element) {
+                document.querySelectorAll('.menu-list li').forEach(li => li.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            // 선택된 패널 보이기
+            if (type === 'calculator') {
+                document.getElementById('calculator-panel').classList.add('active');
+                document.getElementById('current-title').innerText = "앤틱 관세 및 비용 계산기";
+            } else if (type === 'music-instrument') {
+                document.getElementById('music-instrument-panel').classList.add('active');
+                document.getElementById('current-title').innerText = "악기별 클래식 음악";
+            } else if (type === 'music-vocal') {
+                document.getElementById('music-vocal-panel').classList.add('active');
+                document.getElementById('current-title').innerText = "성악가별 성악 음악";
+            }
+        }
+
+        // 갤러리 필터링 기능 (나라별, 시대별, 품목별)
+        let currentFilter = { type: 'country', value: 'all' };
+
+        function filterGallery(type, value, element) {
+            // 갤러리 패널로 강제 이동
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById('gallery-panel').classList.add('active');
+
+            // 메뉴 활성화 표시 갱신
+            if(element) {
+                document.querySelectorAll('.menu-list li').forEach(li => li.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            currentFilter = { type, value };
+            applyFilters();
+            
+            // 타이틀 변경
+            document.getElementById('current-title').innerText = value === 'all' ? "전체 앤틱·빈티지 갤러리" : `${value} 앤틱·빈티지 아카이브`;
+        }
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.card');
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            cards.forEach(card => {
+                const attrVal = card.getAttribute(`data-${currentFilter.type}`);
+                const cardName = card.getAttribute('data-name').toLowerCase();
+                
+                let matchesFilter = (currentFilter.value === 'all' || attrVal === currentFilter.value);
+                let matchesSearch = (cardName.includes(searchText));
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function searchGallery() {
+            // 검색어 입력 시 갤러리 탭으로 전환 후 필터 적용
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById('gallery-panel').classList.add('active');
+            applyFilters();
+        }
+
+        // 관세 계산기 로직
+        function calculateCost() {
+            const price = parseFloat(document.getElementById('itemPrice').value) || 0;
+            const shipping = parseFloat(document.getElementById('shippingFee').value) || 0;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0;
+
+            const totalUSD = price + shipping;
+            const totalKRW = totalUSD * rate;
+            
+            // 간이 관부가세 추정 (과세가격 150달러 초과 시 관세 8%, 부가세 10% 등 단순화된 예시)
+            let taxMsg = "면세 범위 내 또는 기본 산정";
+            if (totalUSD > 150) {
+                // 대략적인 부가세/관세 추정치 반영 가능
+                taxMsg = "미화 150불 초과 (관·부가세 발생 예상)";
+            }
+
+            document.getElementById('calcResult').innerText = 
+                `예상 총 비용: ${Math.round(totalKRW).toLocaleString()} 원 (${taxMsg})`;
+        }
+    </script>
+</body>
+</html>
+✨ 주요 특징:
+디자인 톤: 연한 연두색(Sage Green 계열)과 화이트를 조합하여 클래식하고 아늑한 분위기를 연출했습니다.
+
+사이드바 네비게이션:
+
+나라별 메뉴: 영국, 프랑스, 미국, 독일 등 분류
+
+시대별 메뉴: 빅토리아, 에드워디안, 아르데코 등 분류
+
+품목별 메뉴: 도자기, 가구, 은제품, 시계 등 분류
+
+계산기 메뉴: 해외 직구 또는 앤틱 구매 시 환율 및 비용을 계산할 수 있는 유틸리티 제공
+
+음악 메뉴: 요구하신 대로 [악기별 클래식](바이올린, 첼로, 피아노)과 [성악가별 성악](파바로티, 칼라스, 피셔디스카우 등)으로 깔끔하게 하위 구분하였습니다.
+
+확장성: 추후 사진 데이터베이스나 실제 이미지 링크(URL)를 연동하여 사용할 수 있도록 구조화되어 있습니다.
+
+
+
+
+Gemini는 AI이며 인물 등에 관한 정보 제공 시 실수를 할 수 있습니다. 개인 정보 보호 및 Gemini새 창에서 열기
+
